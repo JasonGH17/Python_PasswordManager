@@ -20,6 +20,7 @@ def getPassword(admin, service):
     key = getHexKey(ADMINPASS, service)
     cursor = db.execute(f'SELECT * FROM KEYS WHERE PASS_KEY="{key}"')
     passKey = ""
+    print(cursor)
     for row in cursor:
         passKey = row[0]
     
@@ -29,13 +30,21 @@ def addPassword(service, admin):
     key = getHexKey(admin, service)
     command = 'INSERT INTO KEYS (PASS_KEY) VALUES (%s);' %(f"'{key}'")
     db.execute(command)
+    command = 'INSERT INTO SERVICES (SERVS) VALUES (%s);' %(f"'{service}'")
+    db.execute(command)
 
     return createPassword(key, service, admin)
+
+def getServices():
+    cursor = db.execute('SELECT * FROM SERVICES')
+    return cursor
 
 if connect == str(ADMINPASS):
     try:
         db.execute('''CREATE TABLE KEYS
             (PASS_KEY TEXT PRIMARY KEY NOT NULL);''')
+        db.execute('''CREATE TABLE SERVICES
+            (SERVS TEXT PRIMARY SERV NOT NULL);''')
         print("You safe has been created! What would you like to store in it today?")
     except:
         print("You have a safe, what would you like to store in it today?")
@@ -49,6 +58,7 @@ if connect == str(ADMINPASS):
             service = input("What is the name of the service\n")
             print(f'\n{service.capitalize()} password created:\n{addPassword(service, ADMINPASS)}')
         elif cmd == "g":
+            print(f"Your services: {getServices()}\n")
             service = input("What is the name of the service\n")
             print(f"\n{service.capitalize()} password:\n{getPassword(ADMINPASS, service)}")
         else:
